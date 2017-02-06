@@ -6,7 +6,7 @@ $(".reset").click(resetForm);
 $("#gradeform").submit(submitForm);
 
 
-var submitForm = function() {
+var submitForm = function(e) {
 	var values = {};
 	$("input").each(function() {
 		values[$(this).attr("name")] = $(this).val();
@@ -17,6 +17,7 @@ var submitForm = function() {
 	$("#data-results").show();
 	$("#data-entry").hide();
 	$(".submit").hide();
+	e.preventDefault();
 	return false;
 }
 
