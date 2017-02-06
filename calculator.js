@@ -2,10 +2,8 @@
 
 $("#data-results").hide();
 
-$(".reset").click(resetForm;
-$("#gradeform").submit(submitForm) {
-
-}
+$(".reset").click(resetForm);
+$("#gradeform").submit(submitForm);
 
 
 var submitForm = function() {
