@@ -2,11 +2,13 @@
 
 $("#data-results").hide();
 
-$(".submit").click(submitForm());
-$(".reset").click(resetForm());
+$(".reset").click(resetForm;
+$("#gradeform").submit(submitForm) {
+
+}
 
 
-function submitForm() {
+var submitForm = function() {
 	var values = {};
 	$("input").each(function() {
 		values[$(this).attr("name")] = $(this).val();
@@ -17,10 +19,10 @@ function submitForm() {
 	$("#data-results").show();
 	$("#data-entry").hide();
 	$(".submit").hide();
-
+	return false;
 }
 
-function resetForm() {
+var resetForm = function() {
 	$("input").each(function() {
 		$(this).val('');
 		$(this).attr("disabled", "false");
