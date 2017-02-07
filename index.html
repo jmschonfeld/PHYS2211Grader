@@ -6,10 +6,10 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <link rel="stylesheet" href="/PHYS2211Grader/assets/css/style.css?v=671c67d18b3cc84049546bfcf420b25d3f24f56d">
+  <link rel="stylesheet" href="http://jmschonfeld.me/PHYS2211Grader/assets/css/style.css?v=671c67d18b3cc84049546bfcf420b25d3f24f56d">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script type="text/javascript" src="/PHYS2211Grader/assets/js/script.js"></script>
+  <script type="text/javascript" src="http://jmschonfeld.me/PHYS2211Grader/assets/js/script.js"></script>
 
   <title>PHYS 2211 Grader</title>
   <meta name="description" content="A website that automatically calculates grades for the Georgia Tech PHYS 2211 class">
@@ -30,133 +30,161 @@
         <div class="download-bar">
         <div class="inner">
           
-          <a style="float: right;" class='reset' href="#">Reset Form</a>
+          <button style="float: right;" class='reset btn btn-default' >Reset Form</a>
         </div>
         <span class="blc"></span><span class="trc"></span>
         </div>
         <article class="markdown-body">
         <div id='data-entry'>
-          <h2>Enter Current Grade Information:</h2>
+          <center><u><h2>Current Grade Information:</h2></u></center>
 
           <form id='gradeform'>
-            <h3>Test Grades:</h3>
-            <div class="form-group">
+            <h2>Test Grades:</h2>
+            <div class="row">
+            <div class="form-group col-md-3">
               <label for="test1">Test 1</label>
               <div class="input-group">
-                <input type="text" class="form-control" id="test1" name="test1" aria-describedby="pcaddon1" width="25%">
+                <input type="text" class="form-control" id="test1" name="test1" aria-describedby="pcaddon1">
                 <span class="input-group-addon" id="pcaddon1">%</span>
               </div>
             </div>
-            <div class="form-group">
+            <div class="form-group col-md-3">
               <label for="test2">Test 2</label>
               <div class="input-group">
                 <input type="text" class="form-control" id="test2" name="test2" aria-describedby="pcaddon2">
                 <span class="input-group-addon" id="pcaddon2">%</span>
               </div>
             </div>
-            <div class="form-group">
+            <div class="form-group col-md-3">
               <label for="test3">Test 3</label>
               <div class="input-group">
                 <input type="text" class="form-control" id="test3" name="test3" aria-describedby="pcaddon3">
                 <span class="input-group-addon" id="pcaddon3">%</span>
               </div>
             </div>
-            <div class="form-group">
+            <div class="form-group col-md-3">
               <label for="test4">Test 4</label>
               <div class="input-group">
                 <input type="text" class="form-control" id="test4" name="test4" aria-describedby="pcaddon4">
                 <span class="input-group-addon" id="pcaddon4">%</span>
               </div>
             </div>
+            </div>
 
-            <h3>Labs:</h3>
-            <div class="form-group">
+            <h2>Labs:</h2>
+            <div class="row">
+            <div class="form-group col-md-4">
               <label for="labA">Lab Assignments Average</label>
               <div class="input-group">
                 <input type="text" class="form-control" id="labA" name="labA" aria-describedby="pcaddon5">
                 <span class="input-group-addon" id="pcaddon5">%</span>
               </div>
             </div>
-            <div class="form-group">
+            <div class="form-group col-md-3">
               <label for="labB">Lab Checkpoints</label>
               <div class="input-group">
                 <input type="text" class="form-control" id="labB" name="labB" aria-describedby="pcaddon6">
                 <span class="input-group-addon" id="pcaddon6">%</span>
               </div>
             </div>
-            <div class="form-group">
+            <div class="form-group col-md-3">
               <label for="labC">Lab Quiz</label>
               <div class="input-group">
                 <input type="text" class="form-control" id="labC" name="labC" aria-describedby="pcaddon7">
                 <span class="input-group-addon" id="pcaddon7">%</span>
               </div>
             </div>
+            </div>
 
-            <h3>Final:</h3>
-            <div class="form-group">
+            <h2>Final:</h2>
+            <div class="row">
+            <div class="form-group col-md-3">
               <label for="final">Final Exam</label>
               <div class="input-group">
                 <input type="text" class="form-control" id="final" name="final" aria-describedby="pcaddon8">
                 <span class="input-group-addon" id="pcaddon8">%</span>
               </div>
             </div>
+            </div>
 
-            <h3>Bucket Points:</h3>
-            <div class="form-group">
+            <h2>Bucket Points:</h2>
+            <small>Check the box for each category you are counting towards your bucket points, and fill in its associated percentage. Un-checked categories do not need a percentage (they do not count toward the grade)</small><br><br>
+            <div class="row">
+            <div class="form-group col-md-4">
               <label for="clickers">Clickers</label>
               <div class="input-group">
-                <input type="text" class="form-control" id="clickers" name="clickers" aria-describedby="pcaddon9">
+                <span class="input-group-addon">
+                  <input type="checkbox" aria-label="clickers" id="clickers-check" name="clickers-check">
+                </span>
+                <input type="text" class="form-control" id="clickers" aria-label="clickers" name="clickers" aria-describedby="pcaddon9">
                 <span class="input-group-addon" id="pcaddon9">%</span>
               </div>
             </div>
-            <div class="form-group">
+            <div class="form-group col-md-4">
               <label for="homework">Homework</label>
               <div class="input-group">
-                <input type="text" class="form-control" id="homework" name="homework" aria-describedby="pcaddon10">
+                <span class="input-group-addon">
+                  <input type="checkbox" aria-label="homework" id="homework-check" name="homework-check">
+                </span>
+                <input type="text" class="form-control" id="homework" aria-label="homework" name="homework" aria-describedby="pcaddon10">
                 <span class="input-group-addon" id="pcaddon10">%</span>
               </div>
             </div>
-            <div class="form-group">
+            <div class="form-group col-md-4">
               <label for="optional">Optional</label>
               <div class="input-group">
-                <input type="text" class="form-control" id="optional" name="optional" aria-describedby="pcaddon11">
+                <span class="input-group-addon">
+                  <input type="checkbox" aria-label="optional" id="optional-check" name="optional-check">
+                </span>
+                <input type="text" class="form-control" id="optional" aria-label="optional" name="optional" aria-describedby="pcaddon11">
                 <span class="input-group-addon" id="pcaddon11">%</span>
               </div>
             </div>
-            <div class="form-group">
+            </div>
+            <div class="row">
+            <div class="form-group col-md-4">
               <label for="wiki">Wiki</label>
               <div class="input-group">
-                <input type="text" class="form-control" id="wiki" name="wiki" aria-describedby="pcaddon12">
+                <span class="input-group-addon">
+                  <input type="checkbox" aria-label="wiki" id="wiki-check" name="wiki-check">
+                </span>
+                <input type="text" class="form-control" id="wiki" aria-label="wiki" name="wiki" aria-describedby="pcaddon12">
                 <span class="input-group-addon" id="pcaddon12">%</span>
               </div>
             </div>
-            <div class="form-group">
+            <div class="form-group col-md-4">
               <label for="reading">Reading</label>
               <div class="input-group">
-                <input type="text" class="form-control" id="reading" name="reading" aria-describedby="pcaddon13">
+                <span class="input-group-addon">
+                  <input type="checkbox" aria-label="reading" id="reading-check" name="reading-check">
+                </span>
+                <input type="text" class="form-control" id="reading" aria-label="reading" name="reading" aria-describedby="pcaddon13">
                 <span class="input-group-addon" id="pcaddon13">%</span>
               </div>
             </div>
-            <div class="form-group">
+            <div class="form-group col-md-4">
               <label for="lectures">Public Lectures</label>
               <div class="input-group">
-                <input type="text" class="form-control" id="lectures" name="lectures" aria-describedby="pcaddon14">
+                <span class="input-group-addon">
+                  <input type="checkbox" aria-label="lectures" id="lectures-check" name="lectures-check">
+                </span>
+                <input type="text" class="form-control" id="lectures" aria-label="lectures" name="lectures" aria-describedby="pcaddon14">
                 <span class="input-group-addon" id="pcaddon14">%</span>
               </div>
             </div>
-            <div class="form-group">
-              <label for="bpossible">Bucket Possible</label>
-              <div class="input-group">
-                <input type="text" class="form-control" id="bpossible" name="bpossible" aria-describedby="pcaddon15">
-                <span class="input-group-addon" id="pcaddon15">%</span>
-              </div>
             </div>
-            <button type="submit" class="btn btn-primary">Calculate Grades</button>
+            <div class="row">
+            <center><button type="submit" class="btn btn-primary">Calculate Grades</button></center>
+            </div>
           </form>
 
 
         </div>
         <div id='data-results'>
+          <center> 
+            <u><h2>Calculation Results</h2></u>
+            <div id='res-display'></div>
+          </center>
 
         </div>
 
@@ -166,7 +194,7 @@
     <footer>
       <div class="owner">
       
-      <p><a href="https://github.com/jmschonfeld" class="avatar"><img src="http://jmschonfeld.me/headshot-2.jpg" height="48"></a> <a href="http://jmschonfeld.me">Jeremy Schonfeld</a> maintains <a href="https://github.com/jmschonfeld/PHYS2211Grader">PHYS2211Grader</a></p>
+      <p><a href="https://jmschonfeld.me" class="avatar"><img src="http://jmschonfeld.me/headshot-2.jpg" height="48"></a> <a href="http://jmschonfeld.me">Jeremy Schonfeld</a> maintains <a href="https://github.com/jmschonfeld/PHYS2211Grader">PHYS2211Grader</a></p>
       
 
        
