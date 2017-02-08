@@ -1,4 +1,9 @@
-/** PHYS 2211 Grade Calculator Script **/
+/**
+  * PHYS 2211 Grade Calculator Script
+  *
+  * Author: Jeremy Schonfeld (http://jmschonfeld.me)
+  * 
+  */
 
 $("#data-results").hide();
 
@@ -10,7 +15,17 @@ var bucketWeights = {
 	'wiki-check': 2.0,
 	'reading-check': 1.0,
 	'lectures-check': 1.0
-}
+};
+
+$("input[type=text]").on("keypress", function(event) {
+	var charCode = (event.which) ? event.which : event.keyCode;
+	if (charCode == 46 && $(this).val().indexOf(".") >= 0) {
+		return false;
+	}
+	if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57))
+	 	return false;
+	return true;
+});
 
 $("input[type=text][aria-label]").on('input propertychange paste', function(event) {
 	if ($(this).val() != '') {
@@ -26,14 +41,14 @@ var submitForm = function(e) {
 	var go = true;
 	var totCheck = 0.0;
 	$("input").each(function() {
-		if (($(this).attr("name").startsWith("lab") && !$(this).val().trim()) && go) {
+		if (($(this).attr("name").startsWith("lab") && !$(this).val().trim().length) && go) {
 			console.log("invalid lab field (blank)");
 			alert("You must fill out all three lab grade fields");
 			go = false;
 		}
 		if ($(this)[0].hasAttribute("aria-label") && go) {
 			var checkbox = $("#" + $(this).attr("name") + "-check");
-			if (checkbox.is(":checked") && !$(this).val().trim()) {
+			if (checkbox.is(":checked") && !$(this).val().trim().length) {
 				console.log("invalid bucket field (blank)");
 				alert("You must input a percentage for all selected bucket categories");
 				go = false;
@@ -44,7 +59,7 @@ var submitForm = function(e) {
 			totCheck += bucketWeights[$(this).attr("name")] * ckd;
 			values[$(this).attr("name")] = ckd;
 		} else {
-			if (!$(this).val() && $(this)[0].hasAttribute("aria-label")) {
+			if (!$(this).val().length && $(this)[0].hasAttribute("aria-label")) {
 				values[$(this).attr("name")] = 0.0;
 			} else {
 				values[$(this).attr("name")] = $(this).val();
@@ -65,18 +80,19 @@ var submitForm = function(e) {
 
 		if (!isValidPrediction(values)) {
 			console.log("invalid prediction (blank fields)");
-			alert("In valid test score, please fill in ALL scores that you have so far and leave future tests blank");
+			alert("Invalid test score; please fill in ALL scores that you have so far and leave future tests blank");
 			isResetBack = true;
 			resetForm();
 			return false;
 		}
 		var predictions = predict(values);
-		displayPredictions(predictions);
+		displayPredictions(predictions, false);
 
 	} else {
+		var predFinal = !values['final'].length;
 
-		var grades = calcResults(values);
-		displayResults(grades);
+		var grades = calcResults(values, predFinal);
+		displayResults(grades, predFinal);
 
 	}
 
@@ -94,8 +110,10 @@ var submitForm = function(e) {
 var resetForm = function() {
 	console.log("Resetting form...");
 	$("input").each(function() {
-		if (!isResetBack)
+		if (!isResetBack) {
 			$(this).val('');
+			$(this).prop("checked", false);
+		}
 		$(this).removeAttr('disabled');
 	});
 	$(".reset").addClass("disabled");
@@ -113,11 +131,11 @@ $(".reset").click(resetForm);
 $("#gradeform").submit(submitForm);
 
 function isPrediction(values) {
-	return !values['testA'] || !values['testB'] || !values['testC'] || !values['testD'] || !values['final'];
+	return !values['test1'].length || !values['test2'].length || !values['test3'].length || !values['test4'].length;
 }
 
 function isValidPrediction(values) {
-	var check = ['testA', 'testB', 'testC', 'testD', 'final'];
+	var check = ['test1', 'test2', 'test3', 'test4', 'final'];
 	var foundBlank = false;
 	for (i = 0; i < check.length; i++) {
 		if (foundBlank) {
@@ -171,10 +189,18 @@ function testAvgNeeded(goal, values, extraCredit, bucket, curAvg) {
 	//assuming a 90 on the final:
 	var b = (a - 90.0 * 25.0) / 45.0;
 	var ret = (b * 4.0 - curAvg.sum) / (4.0 - curAvg.tot);
+	ret = Math.max(0, ret);
 	return ret;
 }
 
-function calcResults(values) {
+function finalNeeded(goal, values, calc) {
+	var a =  (goal * 100.0 - calc['extraCredit'] * 2.0 - calc['bucket'] * 10.0) / 90.0 * 0.9 * 100.0  - parseFloat(values['labA']) * 5.0 - parseFloat(values['labB']) * 10.0 - parseFloat(values['labC']) * 5.0;
+	var b = (a - calc['testAvg'] * 45.0) / 25.0;
+	b = Math.max(0, b);
+	return b;
+}
+
+function calcResults(values, predFinal) {
 	console.log("Calculating results with values " + JSON.stringify(values));
 	var bucketPossible = (parseFloat(values['clickers']) * 3.0 * values['clickers-check'] + parseFloat(values['homework']) * 5.0 * values['homework-check'] +
 								parseFloat(values['optional']) * 3.0  * values['optional-check'] + parseFloat(values['wiki']) * 2.0 * values['wiki-check'] +
@@ -182,50 +208,78 @@ function calcResults(values) {
 	var extraCredit = Math.max(0, Math.min(5, bucketPossible * values['totCheck'] / 100.0 - parseFloat(values['homework']) * 5.0 / 100) + parseFloat(values['homework']) * 5.0 / 100.0 - 10.0) / 2.0 * 100.0;
 	var bucket = Math.min(10, (bucketPossible * values['totCheck']) / 100.0) / 0.1;
 	var testAvg = calcTestAverage(values['test1'], values['test2'], values['test3'], values['test4']);
-	var core = ((testAvg * 45.0 + parseFloat(values['labA']) * 5.0 + parseFloat(values['labB']) * 10.0 + parseFloat(values['labC']) * 5.0 + parseFloat(values['final']) * 25.0) / 100.0) / 0.9;
-	var overall = (extraCredit * 2.0 + bucket * 10.0 + core * 90.0) / 100.0;
-	var letter = 'F';
-	if (overall >= 60) { letter = 'D'; }
-	if (overall >= 70) { letter = 'C'; }
-	if (overall >= 80) { letter = 'B'; }
-	if (overall >= 90) { letter = 'A'; }
-	var resObj = {
-		'bucketPossible': bucketPossible,
-		'extraCredit': extraCredit,
-		'bucket': bucket,
-		'testAvg': testAvg,
-		'core': core,
-		'overall': overall,
-		'letterGrade': letter
-	};
-	console.log("CALCULATION RESULTS: " + JSON.stringify(resObj));
-	return resObj;
+	if (!predFinal) {
+		var core = ((testAvg * 45.0 + parseFloat(values['labA']) * 5.0 + parseFloat(values['labB']) * 10.0 + parseFloat(values['labC']) * 5.0 + parseFloat(values['final']) * 25.0) / 100.0) / 0.9;
+		var overall = (extraCredit * 2.0 + bucket * 10.0 + core * 90.0) / 100.0;
+		var letter = 'F';
+		if (overall >= 60) { letter = 'D'; }
+		if (overall >= 70) { letter = 'C'; }
+		if (overall >= 80) { letter = 'B'; }
+		if (overall >= 90) { letter = 'A'; }
+		var resObj = {
+			'bucketPossible': bucketPossible,
+			'extraCredit': extraCredit,
+			'bucket': bucket,
+			'testAvg': testAvg,
+			'core': core,
+			'overall': overall,
+			'letterGrade': letter
+		};
+		console.log("CALCULATION RESULTS: " + JSON.stringify(resObj));
+		return resObj;
+	} else {
+		var calc = {
+			'bucketPossible': bucketPossible,
+			'extraCredit': extraCredit,
+			'bucket': bucket,
+			'testAvg': testAvg,
+		};
+		var needed = [
+			finalNeeded(90.0, values, calc),
+			finalNeeded(80.0, values, calc),
+			finalNeeded(70.0, values, calc),
+			finalNeeded(60.0, values, calc)
+		];
+		calc['needed'] = needed;
+		console.log("CALCULATION AND FINAL PREDICTION RESULTS: " + JSON.stringify(calc));
+		return calc;
+	}
 }
 
 function rnd(num) {
 	return Math.round(num * 100.0) / 100.0;
 }
 
-function displayResults(grades) {
+function displayResults(grades, predFinal) {
+	if (predFinal) {
+		displayPredictions(grades, true);
+		return;
+	}
 	var html = "<strong>Bucket Possible:</strong> " + rnd(grades['bucketPossible']);
 	html += "<br><strong>Extra Credit:</strong> " + rnd(grades['extraCredit']);
-	html += "<br><strong>Bucket Points:</strong> " + rnd(grades['bucket']);
+	html += "<br><strong>Bucket Percentage:</strong> " + rnd(grades['bucket']);
 	html += "<br><strong>Test Average:</strong> " + rnd(grades['testAvg']);
 	html += "<br><strong>Core:</strong> " + rnd(grades['core']);
 	html += "<br><h3>Final Grade:</h3> " + rnd(grades['overall']) + " (" + grades['letterGrade'] + ")";
 	$("#res-display").html(html);
 }
 
-function displayPredictions(predict) {
+function displayPredictions(predict, predFinal) {
 	var html = "<strong>Current Bucket Possible:</strong> " + rnd(predict['bucketPossible']);
 	html += "<br><strong>Current Extra Credit:</strong> " + rnd(predict['extraCredit']);
-	html += "<br><strong>Current Bucket Points:</strong> " + rnd(predict['bucket']);
-	html += "<br><strong>Current Test Average (without weights):</strong> " + rnd(predict.curAvg.sum / predict.curAvg.tot);
-	html += "<br><br><h3>Test Average Goals:</h3><br><small>These are the total averages of the <i>remaining</i> tests that you need to reach in order to achieve each grade level for the class assuming a 90% on the final</small><br>";
-	html += "<br><strong>90% (A):</strong> " + rnd(predict['needed'][0]) + "%";
-	html += "<br><strong>80% (B):</strong> " + rnd(predict['needed'][1]) + "%";
-	html += "<br><strong>70% (C):</strong> " + rnd(predict['needed'][2]) + "%";
-	html += "<br><strong>60% (D):</strong> " + rnd(predict['needed'][3]) + "%";
+	html += "<br><strong>Current Bucket Percentage:</strong> " + rnd(predict['bucket']);
+	html += "<br><strong>Current Test Average" + (predFinal ? "" : " (without weights)") + ":</strong> " + (predFinal ? rnd(predict['testAvg']) : rnd(predict.curAvg.sum / predict.curAvg.tot));
+	html += "<br><br><h3>" + (predFinal ? "Final Exam" : "Test Average") + " Goals:</h3><small>";
+	var term = predFinal ? " on final exam" : " average on remaining tests";
+	if (!predFinal) {
+		html += "These are the total averages of the <i>remaining</i> tests that you need to reach in order to achieve each grade level for the class assuming a 90% on the final";
+	} else {
+		html += "These are the scores you must reach on your final exam in order to reach each grade level for your semester average";
+	}
+	html += "</small><br><br><strong>90% (A):</strong> " + rnd(predict['needed'][0]) + "%" + term;
+	html += "<br><strong>80% (B):</strong> " + rnd(predict['needed'][1]) + "%" + term;
+	html += "<br><strong>70% (C):</strong> " + rnd(predict['needed'][2]) + "%" + term;
+	html += "<br><strong>60% (D):</strong> " + rnd(predict['needed'][3]) + "%" + term;
 	$("#res-display").html(html);
 }
 
@@ -240,7 +294,7 @@ function predTestAvg(testA, testB, testC, testD) {
 	var tests = [testA, testB, testC, testD];
 	console.log("predicting tests " + JSON.stringify(tests));
 	for (i = 0; i < 4; i++) {
-		if (tests[i]) {
+		if (tests[i].length) {
 			sum += parseFloat(tests[i]);
 			tot++;
 		}
